@@ -9,6 +9,11 @@ int main() {
   while(true) {
     std::cout<<"$ " << std::flush;
     std::getline(std::cin,command);
+    
+    if(command=="exist"){
+      break;
+    }
     std::cout<<command<<": command not found" << std::endl;
   }
+
 }

@@ -10,7 +10,7 @@ int main() {
     std::cout<<"$ " << std::flush;
     std::getline(std::cin,command);
     
-    if(command=="exist"){
+    if(command=="exit"){
       break;
     }
     std::cout<<command<<": command not found" << std::endl;

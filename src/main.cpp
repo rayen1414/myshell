@@ -4,8 +4,18 @@
 #include <cstdlib>
 #include <filesystem>
 #include <vector>
-
 namespace fs = std::filesystem;
+class shell {
+private:
+  // Flush after every std::cout / std:cerr
+  char*path1 = std::getenv("PATH");
+  std::string path = path1 ? std::string(path1) : "";
+  //no path else { std::cout<<"path is not set" << std::endl;}
+  std::unordered_set<std::string> commands ;
+  std::string command;
+
+
+
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
   if(pa.empty()){
@@ -25,7 +35,8 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
   }
   return"";
 }
-std::string exe_exist(const std::string&command, const std::string&pa){
+//execute the exe
+bool exe_exist(const std::string&command, const std::string&pa){
   std::vector<std::string> output_vector;
     std::stringstream ss(command);
     std ::string word;
@@ -37,35 +48,28 @@ std::string exe_exist(const std::string&command, const std::string&pa){
       for(int i=0;i<output_vector.size();++i){
         std::cout<<"arg #"<<i<<":"<<output_vector[i]<<std::endl;
       }
-      std::vector<char*> c_args;
-      for (size_t i = 0; i < output_vector.size(); ++i) { c_args.push_back(&output_vector[i][0]); 
-        }
-      c_args.push_back(nullptr);
-      _spawnv(_P_WAIT, find_exe(output_vector[0],pa).c_str(), c_args.data());
-
+    std::system(command.c_str());
+    return true;
+    }
+    else{
+      return false;
     }
 
 }
-int main() {
-
-  // Flush after every std::cout / std:cerr
-  char*path1 = std::getenv("PATH");
-  std::string path(path1);
-
-  
-  //no path else { std::cout<<"path is not set" << std::endl;}
-  std::unordered_set<std::string> commands = {"echo", "exit", "type"};
-  std::string command;
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
-
+public:
+  shell() {
+    commands = {"echo", "exit", "type"};
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
+  };
+  int run() {
 
   while(true ) {
     command.clear();
     std::cout<<"$ " << std::flush;
     std::getline(std::cin,command);
     //echo command
-    if(command.substr(0,4)=="echo"){
+    if(command.substr(0,4)=="echo "){
       std::cout<<command.substr(5)<<std::endl;
       
     }
@@ -75,7 +79,7 @@ int main() {
     }
 
     //type command 
-    else if(command.substr(0,4)=="type"){
+    else if(command.substr(0,5)=="type "){
       //check if command is a shell builtin
     if(commands.find(command.substr(5)) != commands.end()){ 
       std::cout<<command.substr(5)<<" is a shell builtin" << std::endl;
@@ -89,7 +93,7 @@ int main() {
     }
 
     //command in path 
-    else if(exe_exist(command,path)!= ""){
+    else if(exe_exist(command,path)){
     
     }
 
@@ -97,5 +101,10 @@ int main() {
       std::cout<<command<<": command not found" << std::endl;
     }
   } 
-
+return 0;
+}
+};
+int main() {
+    shell my_shell;
+    return my_shell.run();
 }

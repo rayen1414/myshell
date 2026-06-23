@@ -15,8 +15,10 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
     while(std::getline(ss, dir, ':')){
       fs::path full = fs::path(dir) / file_name;
       if(fs::exists(full)){
+        fs::perms p=fs::status(full).permissions();
+        if((p & fs::perms::owner_exec) != fs::perms::none || (p & fs::perms::group_exec) != fs::perms::none || (p & fs::perms::others_exec) != fs::perms::none){
         return (full.string());
-      }
+      }}
     }
   }
   return"";

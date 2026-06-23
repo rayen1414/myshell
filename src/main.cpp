@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <vector>
-#include <process.h>
+
 namespace fs = std::filesystem;
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){

@@ -3,6 +3,8 @@
 #include <unordered_set>
 #include <cstdlib>
 #include <filesystem>
+#include <vector>
+#include <process.h>
 namespace fs = std::filesystem;
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
@@ -23,11 +25,33 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
   }
   return"";
 }
+std::string exe_exist(const std::string&command, const std::string&pa){
+  std::vector<std::string> output_vector;
+    std::stringstream ss(command);
+    std ::string word;
+    while(std::getline(ss,word,' ')){
+      output_vector.push_back(word);
+    }
+    if(find_exe(output_vector[0],pa) !=""){
+      std::cout<<"Program was passed "<<output_vector.size()<<" arguments"<<std::endl;
+      for(int i=0;i<output_vector.size();++i){
+        std::cout<<"arg #"<<i<<":"<<output_vector[i]<<std::endl;
+      }
+      std::vector<char*> c_args;
+      for (size_t i = 0; i < output_vector.size(); ++i) { c_args.push_back(&output_vector[i][0]); 
+        }
+      c_args.push_back(nullptr);
+      _spawnv(_P_WAIT, find_exe(output_vector[0],pa).c_str(), c_args.data());
+
+    }
+
+}
 int main() {
 
   // Flush after every std::cout / std:cerr
   char*path1 = std::getenv("PATH");
   std::string path(path1);
+
   
   //no path else { std::cout<<"path is not set" << std::endl;}
   std::unordered_set<std::string> commands = {"echo", "exit", "type"};
@@ -64,6 +88,10 @@ int main() {
     else {std::cout<<command.substr(5)<<": not found" << std::endl;}
     }
 
+    //command in path 
+    else if(exe_exist(command,path)!= ""){
+    
+    }
 
     else{
       std::cout<<command<<": command not found" << std::endl;

@@ -44,9 +44,13 @@ bool exe_exist(const std::string&command, const std::string&pa){
       output_vector.push_back(word);
     }
     if(find_exe(output_vector[0],pa) !=""){
-      std::cout<<"Program was passed "<<output_vector.size()<<" arguments"<<std::endl;
+      std::cout<<"Program was passed "<<output_vector.size()<<" args (including program name)."<<std::endl;
       for(int i=0;i<output_vector.size();++i){
-        std::cout<<"arg #"<<i<<":"<<output_vector[i]<<std::endl;
+        if (i == 0) {
+                std::cout << "Arg #0 (program name): " << output_vector[i] << "\n";
+            } else {
+                std::cout << "Arg #" << i << ": " << output_vector[i] << "\n";
+            }
       }
     std::system(command.c_str());
     return true;

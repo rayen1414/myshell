@@ -12,6 +12,8 @@ private:
   // Flush after every std::cout / std:cerr
   char*path1 = std::getenv("PATH");
   std::string path = path1 ? std::string(path1) : "";
+  char* home_env = std::getenv("HOME");
+  std::string home_path = home_env ? std::string(home_env) : "/";
   //no path else { std::cout<<"path is not set" << std::endl;}
   //commands set
   void handle_echo(const std::string& raw_line) { 
@@ -36,10 +38,22 @@ private:
 
   //pwd command
   void handle_pwd(const std::string& raw_line) {std::cout<<fs::current_path().string()<<std::endl; };
+
   //cd command
   void handle_cd(const std::string& raw_line) {
-    fs::path current = fs::current_path();
-    fs::path new_path=current/raw_line;
+fs::path new_path;
+
+    if (raw_line == "~") {
+        new_path = home_path;
+    } 
+    else if (raw_line.substr(0, 2) == "~/") {
+
+        new_path = fs::path(home_path) / raw_line.substr(2); 
+    } 
+    else {
+        // Standard absolute or relative path
+        new_path = fs::current_path() / raw_line;
+    }
 try{
 new_path = fs::weakly_canonical(new_path);
 if(fs::exists(new_path)&&fs::is_directory(new_path)){

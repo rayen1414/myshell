@@ -15,8 +15,8 @@ private:
   //no path else { std::cout<<"path is not set" << std::endl;}
   //commands set
   void handle_echo(const std::string& raw_line) { 
-    if (raw_line.size() > 5) {
-            std::cout << raw_line.substr(5) << std::endl; 
+    if (raw_line.size() > 0) {
+            std::cout << raw_line<< std::endl; 
         } else {
             std::cout << std::endl;
         } };
@@ -24,18 +24,28 @@ private:
   void handle_exit(const std::string& raw_line) {test=false; };
   //type command
   void handle_type(const std::string& command) {  //check if command is a shell builtin
-    if(command_map.find(command.substr(5)) != command_map.end()){ 
-      std::cout<<command.substr(5)<<" is a shell builtin" << std::endl;
+    if(command_map.find(command) != command_map.end()){ 
+      std::cout<<command<<" is a shell builtin" << std::endl;
     }
     //find exe in path
     
-   else if (std::string full_path = find_exe(command.substr(5), path); !full_path.empty()) { 
-    std::cout << command.substr(5) << " is " << full_path << std::endl;
+   else if (std::string full_path = find_exe(command, path); !full_path.empty()) { 
+    std::cout << command << " is " << full_path << std::endl;
 }
-    else {std::cout<<command.substr(5)<<": not found" << std::endl;}};
+    else {std::cout<<command<<": not found" << std::endl;}};
 
   //pwd command
   void handle_pwd(const std::string& raw_line) {std::cout<<fs::current_path().string()<<std::endl; };
+  //cd command
+  void handle_cd(const std::string& raw_line) {
+    if(fs::exists(raw_line) && fs::is_directory(raw_line)){
+      fs::current_path(raw_line);
+    }
+    else{
+      std::cout<<"cd: "<<raw_line<<": No such file or directory" << std::endl;
+    }
+
+  };
 //
 
 
@@ -97,6 +107,7 @@ public:
         ADD_CMD(exit);
         ADD_CMD(type);
         ADD_CMD(pwd);
+        ADD_CMD(cd);
         #undef ADD_CMD
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
@@ -108,9 +119,10 @@ public:
     std::cout<<"$ " << std::flush;
     std::getline(std::cin,command);
     std::string cmd =command.substr(0, command.find(' '));
+    std::string target = command.substr(command.find(' ')+1);
     //cmd in command_map
     if(command_map.find(cmd) != command_map.end()){
-      command_map[cmd](command);
+      command_map[cmd](target);
     }
     //command in path 
     else if(exe_exist(command,path)){}

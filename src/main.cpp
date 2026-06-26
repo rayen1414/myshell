@@ -33,8 +33,9 @@ private:
     std::cout << command.substr(5) << " is " << full_path << std::endl;
 }
     else {std::cout<<command.substr(5)<<": not found" << std::endl;}};
+
   //pwd command
-  void handle_pwd(const std::string& raw_line) {std::cout<<fs::current_path()<<std::endl; };
+  void handle_pwd(const std::string& raw_line) {std::cout<<fs::current_path().string()<<std::endl; };
 //
 
 

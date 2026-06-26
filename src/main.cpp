@@ -45,6 +45,9 @@ new_path = fs::weakly_canonical(new_path);
 if(fs::exists(new_path)&&fs::is_directory(new_path)){
   fs::current_path(new_path);
 }
+else{
+  std::cout << "cd: " << raw_line << ": No such file or directory" << std::endl;
+}
 }catch(const fs::filesystem_error& e){
   std::cout << "cd: " << raw_line << ": No such file or directory" << std::endl;
 }

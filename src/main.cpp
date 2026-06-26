@@ -38,12 +38,16 @@ private:
   void handle_pwd(const std::string& raw_line) {std::cout<<fs::current_path().string()<<std::endl; };
   //cd command
   void handle_cd(const std::string& raw_line) {
-    if(fs::exists(raw_line) && fs::is_directory(raw_line)){
-      fs::current_path(raw_line);
-    }
-    else{
-      std::cout<<"cd: "<<raw_line<<": No such file or directory" << std::endl;
-    }
+    fs::path current = fs::current_path();
+    fs::path new_path=current/raw_line;
+try{
+new_path = fs::weakly_canonical(new_path);
+if(fs::exists(new_path)&&fs::is_directory(new_path)){
+  fs::current_path(new_path);
+}
+}catch(const fs::filesystem_error& e){
+  std::cout << "cd: " << raw_line << ": No such file or directory" << std::endl;
+}
 
   };
 //

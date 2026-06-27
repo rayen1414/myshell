@@ -17,11 +17,15 @@ private:
   //no path else { std::cout<<"path is not set" << std::endl;}
   //commands set
   void handle_echo(const std::string& raw_line) { 
-    if (raw_line.size() > 0) {
-            std::cout << raw_line<< std::endl; 
-        } else {
-            std::cout << std::endl;
-        } };
+    std::vector<std::string> tokens;
+    tokens=in_quotes(raw_line);
+    for (size_t i = 1; i < tokens.size(); i++) {
+        std::cout << tokens[i];
+        if (i + 1 < tokens.size()) {
+            std::cout << " ";
+        }
+    }
+    std::cout << std::endl;};
   //exit command
   void handle_exit(const std::string& raw_line) {test=false; };
   //type command
@@ -75,15 +79,54 @@ else{
 
   bool test=true;
 //toknize the command
-  std::vector<std::string> tokenize(const std::string& command) {
+  std::vector<std::string> tokenize(const std::string& command,char x) {
     std::vector<std::string> tokens;
     std::stringstream ss(command);
     std::string token;
-    while (std::getline(ss, token, ' ')) {
+    while (std::getline(ss, token, x)) {
       tokens.push_back(token);
     }
     return tokens;
   }
+//in quotes
+std::vector<std::string> in_quotes(const std::string ch) {
+    bool in_quotes = false;
+    std::vector<std::string> tokens;
+    std::string current_token = "";
+
+    for (char c : ch) {
+        if (c == '\'') {
+            if (in_quotes == false) {
+                if (!current_token.empty()) {
+                    tokens.push_back(current_token);
+                    current_token = "";
+                }
+                in_quotes = true;
+            }
+            else {
+                if (!current_token.empty()) {
+                    tokens.push_back(current_token);
+                    current_token = "";
+                }
+                in_quotes = false;
+            }
+        }
+        else if (c == ' ' && in_quotes == false) {
+            if (!current_token.empty()) {
+                tokens.push_back(current_token);
+                current_token = "";
+            }
+        }
+        else {
+            current_token += c;
+        }
+    }
+    
+    if (!current_token.empty()) {
+        tokens.push_back(current_token);
+    }
+    return(tokens);
+}
 
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
@@ -105,21 +148,30 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
   return"";
 }
 //execute the exe
-bool exe_exist(const std::string&command, const std::string&pa){
-  std::vector<std::string> output_vector;
+bool exe_exist(const std::string& command, const std::string& pa) {
+    std::vector<std::string> output_vector;
     std::stringstream ss(command);
-    std ::string word;
-    while(std::getline(ss,word,' ')){
-      output_vector.push_back(word);
+    std::string word;
+    
+    getline(ss, word, ' ');
+    
+    std::string full_path = find_exe(word, pa);
+    
+    if (full_path != "") {
+        output_vector = in_quotes(command.substr(command.find(' ') + 1));
+        
+        std::string ch = full_path; 
+        
+        for (int i = 0; i < output_vector.size(); i++) {
+            ch += " \"" + output_vector[i] + "\"";
+        }
+        
+        std::system(ch.c_str());
+        return true;
     }
-    if(find_exe(output_vector[0],pa) !=""){
-    std::system(command.c_str());
-    return true;
+    else {
+        return false;
     }
-    else{
-      return false;
-    }
-
 }
 public:
   shell() {
@@ -141,6 +193,7 @@ public:
     std::getline(std::cin,command);
     std::string cmd =command.substr(0, command.find(' '));
     std::string target = command.substr(command.find(' ')+1);
+
     //cmd in command_map
     if(command_map.find(cmd) != command_map.end()){
       command_map[cmd](target);

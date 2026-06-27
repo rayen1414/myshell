@@ -18,8 +18,9 @@ private:
   //commands set
   void handle_echo(const std::string& raw_line) { 
     std::vector<std::string> tokens;
+    
     tokens=in_quotes(raw_line);
-    for (size_t i = 1; i < tokens.size(); i++) {
+    for (size_t i = 0; i < tokens.size(); i++) {
         std::cout << tokens[i];
         if (i + 1 < tokens.size()) {
             std::cout << " ";
@@ -96,20 +97,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
     for (char c : ch) {
         if (c == '\'') {
-            if (in_quotes == false) {
-                if (!current_token.empty()) {
-                    tokens.push_back(current_token);
-                    current_token = "";
-                }
-                in_quotes = true;
-            }
-            else {
-                if (!current_token.empty()) {
-                    tokens.push_back(current_token);
-                    current_token = "";
-                }
-                in_quotes = false;
-            }
+            in_quotes = !in_quotes;
         }
         else if (c == ' ' && in_quotes == false) {
             if (!current_token.empty()) {
@@ -125,9 +113,8 @@ std::vector<std::string> in_quotes(const std::string ch) {
     if (!current_token.empty()) {
         tokens.push_back(current_token);
     }
-    return(tokens);
+    return tokens;
 }
-
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
   if(pa.empty()){

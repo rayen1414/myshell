@@ -147,7 +147,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     if (full_path != "") {
         output_vector = in_quotes(command.substr(command.find(' ') + 1));
         
-        std::string ch = full_path; 
+        std::string ch = word; 
         
         for (int i = 0; i < output_vector.size(); i++) {
             ch += " \"" + output_vector[i] + "\"";

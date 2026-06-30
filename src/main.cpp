@@ -102,11 +102,18 @@ std::vector<std::string> in_quotes(const std::string ch) {
     std::vector<std::string> tokens;
     std::string current_token = "";
 
-    for (char c : ch) {
-        if (c == '\'') {
+    for (size_t i = 0; i < ch.length(); ++i){
+      char c=ch[i];
+        if (c == '\'') {if(in_doublequotes==true){
+          current_token += c;
+           /* std::string ch1=ch1.substr(i);
+            for(char c1:ch1){}*/
+
+          }
             in_quotes = !in_quotes;
         }
         else if(c == '"'){
+
           in_doublequotes=!in_doublequotes;
 
         }

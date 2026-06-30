@@ -5,6 +5,12 @@
 #include <filesystem>
 #include <functional>
 #include <vector>
+/*#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #include <termios.h>
+#endif*/
 namespace fs = std::filesystem;
 
 class shell {
@@ -92,6 +98,7 @@ else{
 //in quotes
 std::vector<std::string> in_quotes(const std::string ch) {
     bool in_quotes = false;
+    bool in_doublequotes = false;
     std::vector<std::string> tokens;
     std::string current_token = "";
 
@@ -99,7 +106,11 @@ std::vector<std::string> in_quotes(const std::string ch) {
         if (c == '\'') {
             in_quotes = !in_quotes;
         }
-        else if (c == ' ' && in_quotes == false) {
+        else if(c == '"'){
+          in_doublequotes=!in_doublequotes;
+
+        }
+        else if (c == ' ' && in_quotes == false && in_doublequotes==false) {
             if (!current_token.empty()) {
                 tokens.push_back(current_token);
                 current_token = "";
@@ -111,6 +122,12 @@ std::vector<std::string> in_quotes(const std::string ch) {
     }
     
     if (!current_token.empty()) {
+      if(in_quotes){std::vector<std::string> tab=tokenize(current_token,' ');
+        for(int i=0;i<tab.size();i++){
+          tokens.push_back(tab[i]);
+        }
+    }
+      else
         tokens.push_back(current_token);
     }
     return tokens;
@@ -160,6 +177,90 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         return false;
     }
 }
+/*std::string get_colored_input(const std::unordered_map<std::string, std::function<void(const std::string&)>>& cmd_map) {
+    std::string command = "";
+    char c;
+    std::cout<<"$ " << std::flush;
+    
+#ifdef _WIN32
+    // Windows Setup
+    HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD old_mode, current_mode;
+    GetConsoleMode(hInput, &old_mode);
+    current_mode = old_mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
+    SetConsoleMode(hInput, current_mode);
+#else
+    // Linux Setup
+    struct termios old = {0}, current = {0};
+    tcgetattr(0, &old);
+    current = old;
+    current.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(0, TCSANOW, &current);
+#endif
+
+while (true) {
+#ifdef _WIN32
+        DWORD read_chars;
+        ReadConsoleA(hInput, &c, 1, &read_chars, NULL);
+        if (read_chars == 0) continue;
+#else
+        if (read(0, &c, 1) <= 0) break;
+#endif
+if (c == '\n' || c == '\r') { 
+#ifdef _WIN32
+           
+            DWORD events = 0;
+            HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+            GetNumberOfConsoleInputEvents(hInput, &events);
+            
+            if (events > 0) {
+                DWORD read_chars;
+                char next_c;
+                
+                ReadConsoleA(hInput, &next_c, 1, &read_chars, NULL);
+               
+                if (next_c != '\n' && next_c != '\r') {
+                  
+                }
+            }
+#else
+           
+            char next_c;
+            while (read(0, &next_c, 1) > 0 && (next_c == '\n' || next_c == '\r'));
+#endif
+            break;
+        }
+        else if (c == 127 || c == 8) { 
+            if (!command.empty()) {
+                command.pop_back();
+                std::cout << "\r\33[2K$ " << command << std::flush;
+            }
+        } 
+        else if (c == ' ' && command.find(' ') == std::string::npos) {
+            std::cout << "\r\33[2K$ ";
+            if (cmd_map.find(command) != cmd_map.end()) {
+                std::cout << "\033[32m" << command << "\033[0m " << std::flush;
+            } else {
+                std::cout << "\033[31m" << command << "\033[0m " << std::flush;
+            }
+            command += c;
+        } 
+        else {
+            command += c;
+            std::cout << c << std::flush;
+        }
+    }
+
+#ifdef _WIN32
+    SetConsoleMode(hInput, old_mode);
+#else
+    tcsetattr(0, TCSANOW, &old);
+#endif
+
+    std::cout << std::endl; 
+    return command;
+}
+*/
 public:
   shell() {
     #define ADD_CMD(cmd_name) command_map[#cmd_name] = [this](const std::string& line) { handle_##cmd_name(line); }
@@ -178,8 +279,10 @@ public:
     command.clear();
     std::cout<<"$ " << std::flush;
     std::getline(std::cin,command);
-    std::string cmd =command.substr(0, command.find(' '));
-    std::string target = command.substr(command.find(' ')+1);
+    /*command = get_colored_input(command_map);
+    if (command.empty()) continue;*/
+    std::string cmd = command.substr(0, command.find(' '));
+    std::string target = command.substr(command.find(' ') + 1);
 
     //cmd in command_map
     if(command_map.find(cmd) != command_map.end()){

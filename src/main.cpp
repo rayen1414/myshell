@@ -104,17 +104,32 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
     for (size_t i = 0; i < ch.length(); ++i){
       char c=ch[i];
-        if (c == '\'') {if(in_doublequotes==true){
-          current_token += c;
-           /* std::string ch1=ch1.substr(i);
-            for(char c1:ch1){}*/
-
+        if (c == '\'') {
+          
+            std::string ch1=ch.substr(i+1);
+            bool test=false;
+            if(in_quotes==false){int j=0;int z=ch1.length()+1;
+              for(char c1:ch1){
+                j++;
+              if(c1=='"'&&in_doublequotes) z=j;
+              if(c1=='\''&& j<z) { test=true;break;}
+              
+            }
           }
-            in_quotes = !in_quotes;
+          if(test==true||in_quotes)in_quotes = !in_quotes;
+          else current_token += c;
         }
-        else if(c == '"'){
+        else if(c == '"'){ std::string ch1=ch.substr(i+1);
+          bool test=false;
+            if(in_doublequotes==false){
+              for(char c1:ch1){
+              if(c1=='"') {test=true;break;}
+              
+            }
+          }
 
-          in_doublequotes=!in_doublequotes;
+          if(test==true||in_doublequotes)in_doublequotes = !in_doublequotes;
+          else current_token += c;
 
         }
         else if (c == ' ' && in_quotes == false && in_doublequotes==false) {

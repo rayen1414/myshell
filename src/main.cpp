@@ -293,11 +293,14 @@ std::string result = "";
     for (size_t i = 0; i < ch.length(); ++i) {
         if (ch[i] == '\\') {
             if (i + 1 < ch.length()) {
+              if(ch[i + 1]=='"'||ch[i + 1]=='\'')result += ch[i + 1]; 
+              else{
                 result += '"';       
                 result += ch[i + 1]; 
                 result += '"';      
                 i++; 
             }
+          }
         } else {
             result += ch[i];
         }

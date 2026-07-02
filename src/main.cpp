@@ -24,8 +24,7 @@ private:
   //commands set
   void handle_echo(const std::string& raw_line) { 
     std::vector<std::string> tokens;
-    
-    tokens=in_quotes(raw_line);
+    tokens=in_quotes(backshlash(raw_line));
     for (size_t i = 0; i < tokens.size(); i++) {
         std::cout << tokens[i];
         if (i + 1 < tokens.size()) {
@@ -184,8 +183,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     std::string full_path = find_exe(word, pa);
     
     if (full_path != "") {
-        output_vector = in_quotes(command.substr(command.find(' ') + 1));
-        
+        output_vector = in_quotes(backshlash( command.substr(command.find(' ') + 1)));
         std::string ch = word; 
         
         for (int i = 0; i < output_vector.size(); i++) {
@@ -199,6 +197,8 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         return false;
     }
 }
+
+
 /*std::string get_colored_input(const std::unordered_map<std::string, std::function<void(const std::string&)>>& cmd_map) {
     std::string command = "";
     char c;
@@ -283,6 +283,27 @@ if (c == '\n' || c == '\r') {
     return command;
 }
 */
+
+
+// backslash
+std::string backshlash(std::string ch){
+  std::string ch1=ch;
+std::string result = "";
+    
+    for (size_t i = 0; i < ch.length(); ++i) {
+        if (ch[i] == '/') {
+            if (i + 1 < ch.length()) {
+                result += '"';       
+                result += ch[i + 1]; 
+                result += '"';      
+                i++; 
+            }
+        } else {
+            result += ch[i];
+        }
+    }
+    return result;
+}
 public:
   shell() {
     #define ADD_CMD(cmd_name) command_map[#cmd_name] = [this](const std::string& line) { handle_##cmd_name(line); }

@@ -120,9 +120,11 @@ std::vector<std::string> in_quotes(const std::string ch) {
         }
         else if(c == '"'){ std::string ch1=ch.substr(i+1);
           bool test=false;
-            if(in_doublequotes==false){
+            if(in_doublequotes==false){int j=0;int z=ch1.length()+1;
               for(char c1:ch1){
-              if(c1=='"') {test=true;break;}
+                j++;
+              if(c1=='\''&&in_quotes) z=j;
+              if(c1=='"'&& j<z) {test=true;break;}
               
             }
           }
@@ -293,14 +295,11 @@ std::string result = "";
     for (size_t i = 0; i < ch.length(); ++i) {
         if (ch[i] == '\\') {
             if (i + 1 < ch.length()) {
-              if(ch[i + 1]=='"'||ch[i + 1]=='\'')result += ch[i + 1]; 
-              else{
                 result += '"';       
                 result += ch[i + 1]; 
                 result += '"';      
                 i++; 
             }
-          }
         } else {
             result += ch[i];
         }

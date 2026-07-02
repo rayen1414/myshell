@@ -291,7 +291,7 @@ std::string backshlash(std::string ch){
 std::string result = "";
     
     for (size_t i = 0; i < ch.length(); ++i) {
-        if (ch[i] == '/') {
+        if (ch[i] == '\\') {
             if (i + 1 < ch.length()) {
                 result += '"';       
                 result += ch[i + 1]; 

@@ -173,7 +173,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     args.push_back(nullptr);
 
     execvp(args[0], args.data());
-    return();
+    return(true);
     }
     else {
         return false;

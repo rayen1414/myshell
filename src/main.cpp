@@ -181,7 +181,7 @@ pid_t pid = fork();
             // Parent: wait for the specific child to finish
             waitpid(pid, NULL, 0);
             return true;
-        }
+        }}
     else {
         return false;
     }

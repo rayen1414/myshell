@@ -193,6 +193,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         exit(1);
     } else {
         waitpid(pid, NULL, 0);
+        return true;
     }
 #endif
     }

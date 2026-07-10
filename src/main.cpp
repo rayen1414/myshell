@@ -154,39 +154,37 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
 }
 //execute the exe
 bool exe_exist(const std::string& command, const std::string& pa) {
-    std::vector<std::string> output_vector;
-    std::stringstream ss(command);
-    std::string word;
+    // 1. Extract the name the user actually typed
+    std::string word = command.substr(0, command.find(' '));
     
-    getline(ss, word, ' ');
-    
+    // 2. Find the full path to check if it exists
     std::string full_path = find_exe(word, pa);
     
     if (full_path != "") {
- output_vector = in_quotes(command.substr(command.find(' ') + 1));
+        std::vector<std::string> output_vector = in_quotes(command.substr(command.find(' ') + 1));
+        
+        std::vector<char*> args;
+        
+        // 3. IMPORTANT: Use the ORIGINAL name (word) for Arg #0, not the full_path
+        args.push_back(const_cast<char*>(word.c_str())); 
+        
+        for (auto& token : output_vector) {
+            args.push_back(const_cast<char*>(token.c_str()));
+        }
+        args.push_back(nullptr);
 
-    std::vector<char*> args;
-    
-    args.push_back(const_cast<char*>(full_path.c_str()));
-    for (auto& token : output_vector) {
-        args.push_back(const_cast<char*>(token.c_str()));
-    }
-    args.push_back(nullptr);
-pid_t pid = fork();
+        pid_t pid = fork();
         if (pid == 0) {
-            // Child: execute
-            execvp(args[0], args.data());
-            exit(1); // Should not reach here
+            // 4. Use full_path for the file argument, but word for argv[0]
+            execvp(full_path.c_str(), args.data());
+            exit(1);
         } else {
-            // Parent: wait for the specific child to finish
             waitpid(pid, NULL, 0);
             return true;
-        }}
-    else {
-        return false;
+        }
     }
+    return false;
 }
-
 
 /*std::string get_colored_input(const std::unordered_map<std::string, std::function<void(const std::string&)>>& cmd_map) {
     std::string command = "";

@@ -6,7 +6,7 @@
 #include <functional>
 #include <vector>
 #include <unistd.h> 
-#include <sys/wait.h>
+
 /*#ifdef _WIN32
     #include <windows.h>
 #else
@@ -120,6 +120,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
       }
       case state::two:{
+        if(c=='\\') {s=state::backshlash;break;}
         if(c=='"') {s=state::genrale;break;}
         token+=c;
         break;
@@ -132,7 +133,7 @@ if (!token.empty()) {
     tokens.push_back(token);
 }
 return(tokens);
-}
+};
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
   if(pa.empty()){
@@ -173,15 +174,22 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         }
         args.push_back(nullptr);
 
-        pid_t pid = fork();
-        if (pid == 0) {
-            // 4. Use full_path for the file argument, but word for argv[0]
-            execvp(full_path.c_str(), args.data());
-            exit(1);
-        } else {
-            waitpid(pid, NULL, 0);
-            return true;
-        }
+  #ifdef _WIN32
+
+    std::cout << " not supported on Windows " << std::endl;
+#else
+    
+    #include <unistd.h>
+    #include <sys/wait.h>
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        execvp(full_path.c_str(), args.data());
+        exit(1);
+    } else {
+        waitpid(pid, NULL, 0);
+    }
+#endif
     }
     return false;
 }
@@ -307,7 +315,7 @@ public:
     }
   } 
 return 0;
-}
+};
 };
 int main() {
     shell my_shell;

@@ -165,7 +165,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         std::string ch = full_path; 
         
         for (const auto& token : output_vector) {
-            ch += " '" + token + "'";
+            ch += " " + token ;
         }
         std::system(ch.c_str());
         return true;

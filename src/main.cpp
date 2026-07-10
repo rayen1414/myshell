@@ -162,12 +162,12 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     
     if (full_path != "") {
  output_vector = in_quotes(command.substr(command.find(' ') + 1));
-        std::string ch = full_path; 
+        std::string ch = full_path+'"'; 
         
         for (const auto& token : output_vector) {
             ch += " " + token ;
         }
-        ch='"'+ch+'"';
+        ch=ch+'"';
         std::system(ch.c_str());
         return true;
     }

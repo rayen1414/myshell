@@ -106,7 +106,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
         if(c=='\\') s=state::backshlash;
         else if(c=='\'') s=state::single;
         else if(c=='"') s=state::two;
-        else if (c == ' ' && !token.empty()){tokens.push_back(token);token="";}
+        else if (c == ' ' ){if(!token.empty()){tokens.push_back(token);token="";}}
         else token+=c;
         break;
       }

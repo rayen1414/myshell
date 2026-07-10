@@ -110,8 +110,8 @@ std::vector<std::string> in_quotes(const std::string ch) {
    for(char c:ch){
     switch (s){
       case state::genrale:{
-        p=state::genrale;//previous state
-        if(c=='\\') s=state::backshlash;
+        
+        if(c=='\\') {s=state::backshlash;p=state::genrale;}//previous state
         else if(c=='\'') s=state::single;
         else if(c=='"') s=state::two;
         else if (c == ' ' ){if(!token.empty()){tokens.push_back(token);token="";}}
@@ -126,7 +126,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
       }
       case state::two:{
-        if(c=='\\') {s=p;s=state::backshlash;break;}
+        if(c=='\\') {p=state::two;s=state::backshlash;break;}
         if(c=='"') {s=state::genrale;break;}
         token+=c;
         break;

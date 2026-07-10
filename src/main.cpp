@@ -6,6 +6,7 @@
 #include <functional>
 #include <vector>
 #include <unistd.h> 
+#include <sys/wait.h>
 /*#ifdef _WIN32
     #include <windows.h>
 #else
@@ -171,10 +172,16 @@ bool exe_exist(const std::string& command, const std::string& pa) {
         args.push_back(const_cast<char*>(token.c_str()));
     }
     args.push_back(nullptr);
-
-    execvp(args[0], args.data());
-    return(true);
-    }
+pid_t pid = fork();
+        if (pid == 0) {
+            // Child: execute
+            execvp(args[0], args.data());
+            exit(1); // Should not reach here
+        } else {
+            // Parent: wait for the specific child to finish
+            waitpid(pid, NULL, 0);
+            return true;
+        }
     else {
         return false;
     }

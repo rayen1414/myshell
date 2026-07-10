@@ -105,10 +105,12 @@ std::vector<std::string> in_quotes(const std::string ch) {
    enum class state{genrale, two, single,backshlash};
    std::string token;
    state s=state::genrale;
+   state p;
    std::vector<std::string> tokens;
    for(char c:ch){
     switch (s){
       case state::genrale:{
+        p=state::genrale;//previous state
         if(c=='\\') s=state::backshlash;
         else if(c=='\'') s=state::single;
         else if(c=='"') s=state::two;
@@ -116,7 +118,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
         else token+=c;
         break;
       }
-      case state::backshlash :{token+=c;s=state::genrale;break;}
+      case state::backshlash :{token+=c;s=p;break;}
       case state::single:{
         if(c=='\'') {s=state::genrale;break;}
         token+=c;
@@ -124,7 +126,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
       }
       case state::two:{
-        if(c=='\\') {break;}
+        if(c=='\\') {s=p;s=state::backshlash;break;}
         if(c=='"') {s=state::genrale;break;}
         token+=c;
         break;

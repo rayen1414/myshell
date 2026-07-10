@@ -124,7 +124,7 @@ std::vector<std::string> in_quotes(const std::string ch) {
 
       }
       case state::two:{
-        if(c=='\\') {s=state::backshlash;break;}
+        if(c=='\\') {break;}
         if(c=='"') {s=state::genrale;break;}
         token+=c;
         break;

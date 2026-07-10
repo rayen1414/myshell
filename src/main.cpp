@@ -6,7 +6,11 @@
 #include <functional>
 #include <vector>
 #include <unistd.h> 
-
+#ifdef _WIN32
+#else
+    #include <unistd.h>
+    #include <sys/wait.h>
+    #endif
 /*#ifdef _WIN32
     #include <windows.h>
 #else
@@ -179,8 +183,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     std::cout << " not supported on Windows " << std::endl;
 #else
     
-    #include <unistd.h>
-    #include <sys/wait.h>
+  
 
     pid_t pid = fork();
     if (pid == 0) {

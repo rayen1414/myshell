@@ -24,7 +24,7 @@ private:
   //commands set
   void handle_echo(const std::string& raw_line) { 
     std::vector<std::string> tokens;
-    tokens=in_quotes(backshlash(raw_line));
+    tokens=in_quotes(raw_line);
     for (size_t i = 0; i < tokens.size(); i++) {
         std::cout << tokens[i];
         if (i + 1 < tokens.size()) {
@@ -96,64 +96,40 @@ else{
   }
 //in quotes
 std::vector<std::string> in_quotes(const std::string ch) {
-    bool in_quotes = false;
-    bool in_doublequotes = false;
-    std::vector<std::string> tokens;
-    std::string current_token = "";
+   enum class state{genrale, two, single,backshlash};
+   std::string token;
+   state s=state::genrale;
+   std::vector<std::string> tokens;
+   for(char c:ch){
+    switch (s){
+      case state::genrale:{
+        if(c=='\\') s=state::backshlash;
+        else if(c=='\'') s=state::single;
+        else if(c=='"') s=state::two;
+        else if (c == ' ' && !token.empty()){tokens.push_back(token);token="";}
+        else token+=c;
+        break;
+      }
+      case state::backshlash :{token+=c;s=state::genrale;break;}
+      case state::single:{
+        if(c=='\'') {s=state::genrale;break;}
+        token+=c;
+        break;
 
-    for (size_t i = 0; i < ch.length(); ++i){
-      char c=ch[i];
-        if (c == '\'') {
-          
-            std::string ch1=ch.substr(i+1);
-            bool test=false;
-            if(in_quotes==false){int j=0;int z=ch1.length()+1;
-              for(char c1:ch1){
-                j++;
-              if(c1=='"'&&in_doublequotes) z=j;
-              if(c1=='\''&& j<z) { test=true;break;}
-              
-            }
-          }
-          if(test==true||in_quotes)in_quotes = !in_quotes;
-          else current_token += c;
-        }
-        else if(c == '"'){ std::string ch1=ch.substr(i+1);
-          bool test=false;
-            if(in_doublequotes==false){int j=0;int z=ch1.length()+1;
-              for(char c1:ch1){
-                j++;
-              if(c1=='\''&&in_quotes) z=j;
-              if(c1=='"'&& j<z) {test=true;break;}
-              
-            }
-          }
+      }
+      case state::two:{
+        if(c=='"') {s=state::genrale;break;}
+        token+=c;
+        break;
+      }
+      
+    }
 
-          if(test==true||in_doublequotes)in_doublequotes = !in_doublequotes;
-          else current_token += c;
-
-        }
-        else if (c == ' ' && in_quotes == false && in_doublequotes==false) {
-            if (!current_token.empty()) {
-                tokens.push_back(current_token);
-                current_token = "";
-            }
-        }
-        else {
-            current_token += c;
-        }
-    }
-    
-    if (!current_token.empty()) {
-      if(in_quotes){std::vector<std::string> tab=tokenize(current_token,' ');
-        for(int i=0;i<tab.size();i++){
-          tokens.push_back(tab[i]);
-        }
-    }
-      else
-        tokens.push_back(current_token);
-    }
-    return tokens;
+   }
+if (!token.empty()) {
+    tokens.push_back(token);
+}
+return(tokens);
 }
 //find exe with directory path
 std::string find_exe(const std::string&file_name, const std::string&pa){
@@ -185,7 +161,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     std::string full_path = find_exe(word, pa);
     
     if (full_path != "") {
-        output_vector = in_quotes(backshlash( command.substr(command.find(' ') + 1)));
+        output_vector = in_quotes(command.substr(command.find(' ') + 1));
         std::string ch = word; 
         
         for (int i = 0; i < output_vector.size(); i++) {
@@ -287,32 +263,6 @@ if (c == '\n' || c == '\r') {
 */
 
 
-// backslash
-std::string backshlash(std::string ch){
-  std::string ch1=ch;
-std::string result = "";
-    
-    for (size_t i = 0; i < ch.length(); ++i) {
-        if (ch[i] == '\\') {
-          if(ch[i + 1]=='"'){
-                result += '\'';       
-                result += ch[i + 1]; 
-                result += '\'';      
-                i++; 
-          }
-          else{
-            if (i + 1 < ch.length()) {
-                result += '"';       
-                result += ch[i + 1]; 
-                result += '"';      
-                i++; 
-            }}
-        } else {
-            result += ch[i];
-        }
-    }
-    return result;
-}
 public:
   shell() {
     #define ADD_CMD(cmd_name) command_map[#cmd_name] = [this](const std::string& line) { handle_##cmd_name(line); }

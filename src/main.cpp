@@ -174,13 +174,12 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     std::string full_path = find_exe(word, pa);
     
     if (full_path != "") {
-        std::vector<std::string> output_vector = in_quotes(rest);
         
         std::vector<char*> args;
      
         args.push_back(const_cast<char*>(word.c_str())); 
         
-        for (auto& token : output_vector) {
+        for (auto& token : tab) {
             args.push_back(const_cast<char*>(token.c_str()));
         }
         args.push_back(nullptr);

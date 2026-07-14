@@ -170,7 +170,7 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     for(std::string tok : tab){
       rest+=tok;
     }
-std::cout<<rest;
+//std::cout<<rest;
     // 2. Find the full path to check if it exists
     std::string full_path = find_exe(word, pa);
     

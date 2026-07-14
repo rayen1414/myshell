@@ -162,14 +162,10 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
 //execute the exe
 bool exe_exist(const std::string& command, const std::string& pa) {
     std::string word;
-    std::string rest;
 
     std::vector<std::string> tab=in_quotes(command);
     word=tab[0];
-    //std::cout<<word;
-      for(size_t i = 1; i < tab.size(); i++) { 
-        rest += tab[i]; 
-    }
+
     // 2. Find the full path to check if it exists
     std::string full_path = find_exe(word, pa);
     
@@ -179,9 +175,9 @@ bool exe_exist(const std::string& command, const std::string& pa) {
      
         args.push_back(const_cast<char*>(word.c_str())); 
         
-        for (auto& token : tab) {
-            args.push_back(const_cast<char*>(token.c_str()));
-        }
+      for (size_t i = 1; i < tab.size(); i++) { 
+          args.push_back(const_cast<char*>(tab[i].c_str()));
+      }
         args.push_back(nullptr);
 
   #ifdef _WIN32

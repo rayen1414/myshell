@@ -163,11 +163,12 @@ std::string find_exe(const std::string&file_name, const std::string&pa){
 bool exe_exist(const std::string& command, const std::string& pa) {
     std::string word;
     std::string rest;
-    // 1. Extract the name the user actually typed
-    if(command[0]=='\'') {word=in_quotes(command)[0];
-      size_t closing_quote_pos = command.find('\'', command.find('\'') + 1);
-      rest = command.substr(closing_quote_pos + 1);}
-    else { word=command.substr(0, command.find(' '));rest=command.substr(command.find(' ') + 1);}
+
+    std::vector<std::string> tab=in_quotes(command);
+    word=tab[0];
+    for(std::string tok : tab){
+      rest+=tok;
+    }
 
     // 2. Find the full path to check if it exists
     std::string full_path = find_exe(word, pa);

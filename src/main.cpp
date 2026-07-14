@@ -167,10 +167,9 @@ bool exe_exist(const std::string& command, const std::string& pa) {
     std::vector<std::string> tab=in_quotes(command);
     word=tab[0];
     //std::cout<<word;
-    for(std::string tok : tab){
-      rest+=tok;
+      for(size_t i = 1; i < tab.size(); i++) { 
+        rest += tab[i]; 
     }
-std::cout<<rest;
     // 2. Find the full path to check if it exists
     std::string full_path = find_exe(word, pa);
     
